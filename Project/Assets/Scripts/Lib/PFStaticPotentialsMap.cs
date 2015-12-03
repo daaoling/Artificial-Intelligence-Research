@@ -18,45 +18,39 @@ namespace PotentialField
             this.width = width;
             this.height = height;
 
+            map = new int[width][];
             for (int i = 0; i < width; i++)
             {
                 map[i] = new int[height];
             }
         }
 
-        public void addPotentialField(PFPotentialField field)
+        public void addPotentialField(PFPotentialField curfield)
         {
-            addPotentail(field, 1);
+            addPotentail(curfield, 1);
         }
-        public void removePotentialField(PFPotentialField field)
+        public void removePotentialField(PFPotentialField curfield)
         {
-            addPotentail(field, -1);
+            addPotentail(curfield, -1);
         }
-        private void addPotentail(PFPotentialField field, int multiplier)
+        private void addPotentail(PFPotentialField curfield, int multiplier)
         {
-            for (int i = (int) Mathf.Max(origin.x, (field.position.x - field.potentialBoundsHalfWidth)); 
-                    i < Mathf.Min((origin.x + width), (field.position.x + field.potentialBoundsHalfWidth)); i++)
+            for (int i = (int)Mathf.Max(origin.x, (curfield.position.x - curfield.potentialBoundsHalfWidth));
+                    i < Mathf.Min((origin.x + width), (curfield.position.x + curfield.potentialBoundsHalfWidth)); i++)
             {
-                for (int j = (int)Mathf.Max(origin.y, (field.position.y - field.potentialBoundsHalfHeight));
-                    j < Mathf.Min((origin.y + height), (field.position.y + field.potentialBoundsHalfHeight)); j++)
+                for (int j = (int)Mathf.Max(origin.y, (curfield.position.y - curfield.potentialBoundsHalfHeight));
+                    j < Mathf.Min((origin.y + height), (curfield.position.y + curfield.potentialBoundsHalfHeight)); j++)
                 {
-                    map[i][j] = multiplier * field.getLocalPotential(i - (int)field.position.x, j - (int)field.position.y);
+                    map[i][j] += multiplier * curfield.getLocalPotential(i - (int)curfield.position.x, j - (int)curfield.position.y);
                 }
             }
+
+
         }
 
         public int getPotential(int x, int y)
         {
             return map[x][y];
-        }
-
-        public bool IsInBound(Vector2 curPos)
-        {
-            return
-                curPos.x <= (origin.x + width)
-                    && curPos.x >= (origin.x)
-                        && curPos.y <= (origin.y + height)
-                            && curPos.y >= (origin.y);
         }
     }
 }

@@ -6,11 +6,10 @@ namespace PotentialField
 {
     public class PFRadialPotentialField : PFPotentialField
     {
-        private int _potential;
-        private int _gradation;
-        public int potential { get { return _potential; } set { _potential = value; } }
-        public int gradation { get { return _gradation; } set { _gradation = value; } }
-        public int radius { get { return Mathf.FloorToInt(_potential / _gradation); } }
+
+        public int potential;
+        public int gradation;
+        public int radius { get { return Mathf.FloorToInt(potential / gradation); } }
 
 
         public PFRadialPotentialField()
@@ -20,21 +19,21 @@ namespace PotentialField
 
         public PFRadialPotentialField
             (PF_TYPE type, Vector3 point,
-                int _potential, int  _gradation)
+                int potential, int gradation)
                     : base(type, point)
         {
-            this._potential = _potential;
-            this._gradation = _gradation;
+            this.potential = potential;
+            this.gradation = gradation;
         }
 
 
         public override int potentialBoundsHalfHeight
         {
-            get { return radius; }
+            get { return this.radius; }
         }
         public override int potentialBoundsHalfWidth
         {
-            get { return radius; }
+            get { return this.radius; }
         }
 
 
@@ -44,7 +43,7 @@ namespace PotentialField
             int manhattan_distance = Mathf.Abs(localX_offset) + Mathf.Abs(localY_offset);
             //int manhattan_distance = (int)new Vector2(Mathf.Abs(localX_offset), Mathf.Abs(localY_offset)).magnitude;
 
-            if (manhattan_distance > radius) return 0;
+            if (manhattan_distance >= radius) return 0;
 
             switch (type)
             {

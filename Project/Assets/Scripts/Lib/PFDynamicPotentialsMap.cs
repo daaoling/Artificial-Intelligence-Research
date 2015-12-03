@@ -47,17 +47,5 @@ namespace PotentialField
             
             return potential;
         }
-
-        public bool IsInBound(Vector2 curPos)
-        {
-            return 
-                curPos.x <= (origin.x + width) 
-                    && curPos.x >= (origin.x) 
-                        && curPos.y <= (origin.y + height) 
-                            && curPos.y >= (origin.y);
-        }
-
-
-
     }
 }

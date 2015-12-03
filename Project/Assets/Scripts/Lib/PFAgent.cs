@@ -4,12 +4,26 @@ using System.Collections.Generic;
 
 namespace PotentialField
 {
+    public class PFAgentTrail
+    {
+        public int worldX;
+        public int worldY;
+        public int potential;
+
+        public PFAgentTrail(int worldX, int worldY, int potential)
+        {
+            this.worldX = worldX;
+            this.worldY = worldY;
+            this.potential = potential;
+        }
+    }
     public class PFAgent : PFRadialPotentialField
     {
+        private List<PFStaticPotentialsMap> staticPotentialMaps = new List<PFStaticPotentialsMap>();
+
         private List<PFDynamicPotentialsMap> dynamicPotentialsMaps = new List<PFDynamicPotentialsMap>();
 
-        public Vector2 position;
-
+        public List<PFAgentTrail> trails = new List<PFAgentTrail>();
 
         public PFAgent()
         {
@@ -17,67 +31,69 @@ namespace PotentialField
         }
 
         public PFAgent(
-            PF_TYPE type, Vector3 point, int _potential, int _gradation, Vector3 _position)
-            : base(type, point, _potential, _gradation)
+            PF_TYPE type, Vector3 position, int potential, int gradation)
+            : base(type, position, potential, gradation)
         {
-            this.position = _position;
+
         }
 
+        public void addStaticPotentialsMap(PFStaticPotentialsMap curMap)
+        {
+            staticPotentialMaps.Add(curMap);
+        }
         public void addDynamicPotentialsMap(PFDynamicPotentialsMap curMap)
         {
             dynamicPotentialsMaps.Add(curMap);
         }
 
       
-        /// <summary>
-        /// 越小越好
-        /// </summary>
-        /// <param name="map_x"></param>
-        /// <param name="map_y"></param>
-        /// <returns></returns>
-        private int dynamicPotentialsSum(int map_x, int map_y)
-        {
-            int sum = 0;
-            for (int i = 0; dynamicPotentialsMaps != null && i < dynamicPotentialsMaps.Count; i++)
-            {
-                sum += dynamicPotentialsMaps[i].getPotential(map_x, map_y);
-            }
-            return sum;
-        }
 
-        public Vector2 nextPosition(int xOffset = 10, int yOffset = 10)
+
+        /// <summary>
+        /// may be bigger than biggest obstacle
+        /// </summary>
+        /// <param name="xOffset"></param>
+        /// <param name="yOffset"></param>
+        /// <returns></returns>
+        public Vector2 nextPosition(int mutiply = 3)
         {
             Vector2 finalResult = position;
             int bestPotential = GetAllPotential(position);
 
-            for (int z = 1; z <= xOffset; z++)
+            #region ready improve
+            for (int z = 1; z <= mutiply; z++)
             {
-                for (int z1 = 1; z1 <= yOffset; z1++)
+                for (int i = -1; i <= 1; i++)
                 {
-                    #region find best position
-                    for (int i = -1; i <= 1; i++)
+                    for (int j = -1; j <= 1; j++)
                     {
-                        for (int j = -1; j <= 1; j++)
+                        if (i == 0 && j == 0) continue;
+
+                        Vector2 newPos = new Vector2(position.x + i * mutiply, position.y + j * mutiply);
+
+                        if (!MapConfig.isInBound(newPos)) continue;
+
+                        int tmpPotential = GetAllPotential(newPos);
+
+                        if (tmpPotential < bestPotential)
                         {
-                            if (i == 0 && j == 0) continue;
-
-                            Vector2 newPos = new Vector2(position.x + i * z, position.y + j * z1);
-
-                            if (!dynamicPotentialsMaps[0].IsInBound(newPos)) continue;
-
-                            int tmpPotential = GetAllPotential(newPos);
-
-                            if (tmpPotential < bestPotential)
-                            {
-                                finalResult = newPos;
-                                bestPotential = tmpPotential;
-                            }
+                            finalResult = newPos;
+                            bestPotential = tmpPotential;
                         }
                     }
-                    #endregion
-
-                    if (position != finalResult) break;
                 }
+                if ((Vector2)position != finalResult) break;
+            }
+            #endregion
+
+            if (finalResult == (Vector2)position)
+            {
+                if (trails.Count > 4)
+                {
+                    trails.RemoveAt(0);
+                }
+
+                trails.Add(new PFAgentTrail((int)this.position.x, (int)this.position.y, 1 * potential));
             }
 
             return finalResult;
@@ -89,19 +105,62 @@ namespace PotentialField
         }
         public void moveToPositionPoint(Vector2 newPos)
         {
-            position = newPos;
+           this.position = newPos;
         }
 
         #region Util
        public int GetAllPotential(Vector2 curPos)
        {
+           int staticPotential = staticPotentialsSum((int)curPos.x, (int)curPos.y);
            int agentsPotential = dynamicPotentialsSum((int)curPos.x, (int)curPos.y);
-           
-           int curAllPotential = agentsPotential;
+           int trailPotential = getTrailPotential((int)curPos.x, (int)curPos.y);
+
+           int curAllPotential
+               = staticPotential
+                    + agentsPotential
+                        + trailPotential;
            
            return curAllPotential;
        }
-        #endregion
+
+       /// <summary>
+       /// 越小越好
+       /// </summary>
+       /// <param name="map_x"></param>
+       /// <param name="map_y"></param>
+       /// <returns></returns>
+       private int dynamicPotentialsSum(int map_x, int map_y)
+       {
+           int sum = 0;
+           for (int i = 0; dynamicPotentialsMaps != null && i < dynamicPotentialsMaps.Count; i++)
+           {
+               sum += dynamicPotentialsMaps[i].getPotential(map_x, map_y);
+           }
+           return sum;
+       }
+       private int staticPotentialsSum(int map_x, int map_y)
+       {
+           int sum = 0;
+           for (int i = 0; staticPotentialMaps != null && i < staticPotentialMaps.Count; i++)
+           {
+               sum += staticPotentialMaps[i].getPotential(map_x, map_y);
+           }
+           return sum;
+       }
+
+       private int getTrailPotential(int map_x, int map_y)
+       {
+           int potential = 0;
+           for (int i = 0; trails!= null && i < trails.Count; i++)
+           {
+               if(trails[i].worldX == map_x && trails[i].worldY == map_y)
+               {
+                   potential += trails[i].potential;
+               }
+           }
+           return potential;
+       }
+       #endregion
     }
 }
 

@@ -5,11 +5,11 @@ using PotentialField;
 
 public class HelloPotential : MonoBehaviour
 {
-    public static HelloPotential current;
+    //public static HelloPotential current;
 
-    public static int width = 150;
-    public static int height = 43;
-    public static int diaonal = (int)Mathf.Sqrt(150 * 150 + 43 * 43);
+    //public static int width = 150;
+    //public static int height = 43;
+    //public static int diaonal = (int)Mathf.Sqrt(150 * 150 + 43 * 43);
 
     public PFDynamicPotentialsMap curMap;
 
@@ -32,21 +32,19 @@ public class HelloPotential : MonoBehaviour
 
     void Awake()
     {
-        current = this;
 
-        Init();
     }
     
     void Start()
     {
-        Debug.Log(" width :" + width + " height:" + height + " diaonal:" + diaonal);
+        //Debug.Log(" width :" + width + " height:" + height + " diaonal:" + diaonal);
 
         //add attractive field
         followTargetPotential = new PFRadialPotentialField()
         {
              type = PF_TYPE.Attract,
              position = goal.transform.position,
-             potential = width + height,
+             potential = MapConfig.diaonal,
              gradation = 1
         };
 
@@ -74,7 +72,7 @@ public class HelloPotential : MonoBehaviour
         };
 
 
-        curMap = new PFDynamicPotentialsMap(Vector2.zero, width, height);
+        curMap = new PFDynamicPotentialsMap(MapConfig.origin, MapConfig.width, MapConfig.height);
         curMap.addPotentialField(followTargetPotential);
         curMap.addPotentialField(obstaclePotential);
         curMap.addPotentialField(obstaclePotential_1);
@@ -87,14 +85,6 @@ public class HelloPotential : MonoBehaviour
         agent.addDynamicPotentialsMap(curMap);
     }
     
-    MeshFilter meshFilter;
-    Mesh mesh;
-    void Init()
-    {
-        GameObject go = new GameObject("test");
-        meshFilter = go.AddComponent<MeshFilter>();
-        go.AddComponent<MeshRenderer>();
-    }
 
     void Update()
     {
@@ -111,9 +101,9 @@ public class HelloPotential : MonoBehaviour
         {
             //List<Vector3> points = new List<Vector3>();
 
-            for (int i = 0; i < width; i++)
+            for (int i = 0; i < MapConfig.width; i++)
             {
-                for (int j = 0; j < height; j++)
+                for (int j = 0; j < MapConfig.height; j++)
                 {
                     Vector3 center = new Vector3(i + 0.5f, j + 0.5f, 0);
 
