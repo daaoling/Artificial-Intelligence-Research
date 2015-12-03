@@ -15,7 +15,7 @@ namespace PotentialField
         public PFPotentialField goalField;
 
         #region tmp Model
-        public BoxCollider2D[] obstacle;
+        public CircleCollider2D[] obstacle;
         
         public Transform goal;
         
@@ -32,20 +32,13 @@ namespace PotentialField
             obstacleFields = new PFPotentialField[obstacle.Length];
             for (int i = 0; i < obstacleFields.Length; i++)
             {
-                obstacleFields[i] = new PFRectangularPotentialField()
+                obstacleFields[i] = new PFRadialPotentialField()
                 {
                     type = PF_TYPE.Repell,
-                    position = obstacle[i].center,
-                    potential = 20,
+                    position = obstacle[i].transform.position,
+                    potential = 60,
                     gradation = 10,
-                    halfWidth = (int)(obstacle[i].size.x * 0.5f),
-                    halfHeight = (int)(obstacle[i].size.y * 0.5f)
                 };
-
-                Debug.Log((obstacleFields[i] as PFRectangularPotentialField).halfWidth
-                    + " : "
-                        + (obstacleFields[i] as PFRectangularPotentialField).halfHeight);
-
                 obstaclesPotentialsMap.addPotentialField(obstacleFields[i]);
             }
 
@@ -66,9 +59,8 @@ namespace PotentialField
             {
                 for (int i = 0; i < obstacle.Length; i++)
                 {
-                    DrawRect(
-                        obstacle[i].center - Vector2.up * obstacle[i].size.y * 0.5f - Vector2.right * obstacle[i].size.x * 0.5f,
-                            (int)obstacle[i].size.x, (int)obstacle[i].size.y);
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawWireSphere(obstacle[i].transform.position, obstacle[i].radius);
                 }
             }
         }

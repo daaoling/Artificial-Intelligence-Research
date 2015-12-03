@@ -55,7 +55,7 @@ namespace PotentialField
         /// <param name="xOffset"></param>
         /// <param name="yOffset"></param>
         /// <returns></returns>
-        public Vector2 nextPosition(int mutiply = 3)
+        public Vector2 nextPosition(int mutiply = 10)
         {
             Vector2 finalResult = position;
             int bestPotential = GetAllPotential(position);
@@ -86,15 +86,15 @@ namespace PotentialField
             }
             #endregion
 
-            if (finalResult == (Vector2)position)
-            {
-                if (trails.Count > 4)
-                {
-                    trails.RemoveAt(0);
-                }
+            //if (finalResult == (Vector2)position)
+            //{
+            //    if (trails.Count > 4)
+            //    {
+            //        trails.RemoveAt(0);
+            //    }
 
-                trails.Add(new PFAgentTrail((int)this.position.x, (int)this.position.y, 1 * potential));
-            }
+            //    trails.Add(new PFAgentTrail((int)this.position.x, (int)this.position.y, 1 * potential));
+            //}
 
             return finalResult;
         }
@@ -113,12 +113,12 @@ namespace PotentialField
        {
            int staticPotential = staticPotentialsSum((int)curPos.x, (int)curPos.y);
            int agentsPotential = dynamicPotentialsSum((int)curPos.x, (int)curPos.y);
-           int trailPotential = getTrailPotential((int)curPos.x, (int)curPos.y);
+           //int trailPotential = getTrailPotential((int)curPos.x, (int)curPos.y);
 
            int curAllPotential
                = staticPotential
-                    + agentsPotential
-                        + trailPotential;
+                    + agentsPotential;
+                        //+ trailPotential;
            
            return curAllPotential;
        }

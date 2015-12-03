@@ -40,8 +40,8 @@ namespace PotentialField
 
         public override int getLocalPotential(int localX_offset, int localY_offset)
         {
-            int manhattan_distance = Mathf.Abs(localX_offset) + Mathf.Abs(localY_offset);
-            //int manhattan_distance = (int)new Vector2(Mathf.Abs(localX_offset), Mathf.Abs(localY_offset)).magnitude;
+            //int manhattan_distance = Mathf.Abs(localX_offset) + Mathf.Abs(localY_offset);
+            int manhattan_distance = (int)new Vector2(Mathf.Abs(localX_offset), Mathf.Abs(localY_offset)).magnitude;
 
             if (manhattan_distance >= radius) return 0;
 
