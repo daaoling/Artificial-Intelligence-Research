@@ -173,6 +173,7 @@ public class PolyNavAgent : MonoBehaviour{
 				return true;
 			} else {
 				OnInvalid();
+                Debug.Log("OnInvalid");
 				return false;
 			}
 		}
